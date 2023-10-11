@@ -1,10 +1,9 @@
-NODE JS
+EXPRESS JS
 
 - create server
-- listen server
-- routes
-- modules
+- listen to server
+- using methods
+- using sendFile
 
-- fs
-  -> readFile
-  -> readFileSync
+- to use non static file
+    -> use templates (EJS)
