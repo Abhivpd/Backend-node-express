@@ -1,49 +1,55 @@
 import express from 'express';
-import fs from 'fs';
 import path from 'path';
 
 const app = express();   // this is the server
 
+// using middlewares
+
+app.use(express.static(path.join(path.resolve(), 'public')));  //with this static files can be served directly (localhost:3000/public.html, localhost:3000/script.js)  only the ones in the folder specified (public in this case)
+
+app.use(express.urlencoded({ extended: true }));   // to parse the data without this the body will be undefined
+
+app.set('view engine', 'ejs')   // setting up the view engine   /// the folder should be named views
+
+
 // app.get('/', (req, res) => {
-//     res.sendStatus(500);
-// })
 
-// app.get('/getProducts', (req, res) => {
+//     // to serve static files like css, FE js fileLoader, images or vids etc we have static files
 
-//     // res.json({
-//     //     success: true,
-//     //     products: []
-//     // })
-
-//     res.status(200).json({
-//         success: true,
-//         products: ['asasujsdsdsd']
-//     })
+//     res.sendFile('index');
 
 // })
-
-
-// app.get('/getProducts', (req, res) => {
-
-//     // res.sendFile('./index.html'); // gives the error -> path must be absolute or specify root to res.sendFile
-
-//     const file = fs.readFileSync('./index.html');
-//     res.sendFile(file);  //gives the error -> path must be a string to res.sendFile
-
-
-//     // need to specify the path
-
-//     // __dirname cannot be used as for that we need to specify the type as the common js
-
-// })
-
 
 app.get('/', (req, res) => {
 
-    const pathLocation = path.resolve();
-    console.log(pathLocation, path.join(pathLocation, 'index.html'));
-    res.sendFile(path.join(pathLocation, 'index.html'));
+    // res.render('index.ejs') //if we set the extension (.ejs) the no need to set up the view engine
+    res.render('index', { name: 'Abhishek' });
+    //render method is used when we give dynamic data instead of static html
 
+});
+
+
+const users = [];
+
+app.post('/contact', (req, res) => {
+    console.log(req.body);  //gives undefined without urlencoded
+
+    users.push({
+        username: req.body.name,
+        useremail: req.body.email
+    });
+
+    res.redirect('./success')
+});
+
+app.get('/success', (req, res) => {
+    res.render('success');
+})
+
+app.get('/users', (req, res) => {
+    res.json({
+        users
+    })
 })
 
 //listen to server
