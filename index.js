@@ -1,55 +1,47 @@
 import express from 'express';
+import mongoose from 'mongoose';
 import path from 'path';
+import { db } from './database/database.js';
+import Message from './model/messageModel.js';
 
-const app = express();   // this is the server
+const app = express();
 
-// using middlewares
+db.then(() => {
+    console.log('connected')
+}).catch();
 
-app.use(express.static(path.join(path.resolve(), 'public')));  //with this static files can be served directly (localhost:3000/public.html, localhost:3000/script.js)  only the ones in the folder specified (public in this case)
+app.use(express.static(path.join(path.resolve(), 'public')));
 
-app.use(express.urlencoded({ extended: true }));   // to parse the data without this the body will be undefined
+app.use(express.urlencoded({ extended: true }));
 
-app.set('view engine', 'ejs')   // setting up the view engine   /// the folder should be named views
-
-
-// app.get('/', (req, res) => {
-
-//     // to serve static files like css, FE js fileLoader, images or vids etc we have static files
-
-//     res.sendFile('index');
-
-// })
+app.set('view engine', 'ejs')
 
 app.get('/', (req, res) => {
 
-    // res.render('index.ejs') //if we set the extension (.ejs) the no need to set up the view engine
     res.render('index', { name: 'Abhishek' });
-    //render method is used when we give dynamic data instead of static html
-
 });
 
+// app.get('/add', (req, res) => {
+//     const messageData = { name: req.body.name, email: req.body.email }
+//     console.log(messageData);
+//     Message.create({ name: 'Abhishek', email: 'abhishekvpd@gmail.com' })
+//         .then(() => {
+//             res.send('added the data')
+//         })
+//         .catch()
+// })
 
-const users = [];
+app.post('/contact', async (req, res) => {
 
-app.post('/contact', (req, res) => {
-    console.log(req.body);  //gives undefined without urlencoded
+    const { name, email } = req.body
 
-    users.push({
-        username: req.body.name,
-        useremail: req.body.email
-    });
+    await Message.create({ name, email });
 
-    res.redirect('./success')
+    res.redirect('/success')
 });
 
 app.get('/success', (req, res) => {
-    res.render('success');
-})
-
-app.get('/users', (req, res) => {
-    res.json({
-        users
-    })
+    res.send('successfully added the message');
 })
 
 //listen to server
