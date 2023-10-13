@@ -4,6 +4,7 @@ import path from 'path';
 import { db } from './database/database.js';
 import Message from './model/messageModel.js';
 import cookieParser from 'cookie-parser';
+import User from './model/userModel.js';
 
 const app = express();
 
@@ -24,38 +25,21 @@ app.set('view engine', 'ejs')
 const isAuthenticated = (req, res, next) => {
     const { token } = req.cookies;
 
-    if (token) next();     // next mekes sure to go to the next handler where the isAuthenticated handler is used
+    if (token) next();
     else res.render('login');
 }
 
 app.get('/', isAuthenticated, (req, res) => {
-
-    const { token } = req.cookies;
-    console.log(req.cookies);  // gives undefined without cookie parser package
-
-    // this is to check if the user is authenticated
-
-    // if (token) res.render('logout');
-
-    // else res.render('login');
-
-    // this can be used as a middleware as well -> authentication handler
-
     res.render('logout');
 });
 
-app.post('/contact', async (req, res) => {
+app.post('/login', async (req, res) => {
 
-    const { name, email } = req.body
+    const { name, email } = req.body;
 
-    await Message.create({ name, email });
+    const user = await User.create({ name, email });
 
-    res.redirect('/success');
-});
-
-app.post('/login', (req, res) => {
-    // res.cookie('token', 'cookieToken');
-    res.cookie('token', 'cookieToken', {
+    res.cookie('token', user._id, {
         httpOnly: true,
         expires: new Date(Date.now() + 60 * 1000)
     });
@@ -68,10 +52,6 @@ app.get('/logout', (req, res) => {
         expires: new Date(Date.now())
     });
     res.redirect('/');
-})
-
-app.get('/success', (req, res) => {
-    res.send('successfully added the message');
 })
 
 //listen to server
