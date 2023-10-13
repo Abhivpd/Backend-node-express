@@ -1,2 +1,2 @@
-- to use non static file
-    -> use templates (EJS)  -> for passing dynamic data
+AUTHENTICATION
+- cookie
